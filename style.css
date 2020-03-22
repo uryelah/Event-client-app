@@ -1,0 +1,25 @@
+.top-nav li {
+  list-style: none;
+}
+
+.top-nav ul {
+  display: flex;
+  padding-left: 0;
+  justify-content: space-between;
+}
+
+.events {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+.event {
+  box-sizing: border-box;
+  border: 1px solid lightgray;
+  border-radius: 3px;
+  width: 250px;
+  margin: 10px 20px;
+  padding: 15px 20px;
+  white-space: nowrap;
+  overflow: hidden;
+}
