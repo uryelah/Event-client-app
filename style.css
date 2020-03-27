@@ -17,6 +17,11 @@
   --quint-in-out: cubic-bezier(0.86, 0, 0.07, 1);
   --quint-in: cubic-bezier(0.755, 0.05, 0.855, 0.06);
   --quint-out: cubic-bezier(0.23, 1, 0.320, 1);
+  --secondary-light: #ff7b38;
+  --secondary: #ef5c11;
+  --secondary-dark: #c94400;
+  --shadow-20-bottom: 0 1px 6px 0 var(--black-20);
+  --shadow-20-bottom-right: 1px 1px 6px 0 var(--black-20);
   --success-light: #50e8f2;
   --success: #25c1cb;
   --success-dark: #059ca6; 
@@ -29,7 +34,7 @@ body {
   font-family: 'Roboto', sans-serif;
   font-weight: 400;
   margin: 0;
-  padding: 50px 30px;
+  padding: 50px 0;
   box-sizing: border-box;
 }
 
@@ -56,6 +61,17 @@ a:hover {
 
 a:active {
   color: var(--main-dark);
+}
+
+.x-pad-3 {
+  padding-left: 30px;
+  padding-right: 30px;
+}
+
+.max-1200 {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 [class|=alert] {
@@ -85,6 +101,10 @@ a:active {
 .alert-success {
   background-color: var(--success);
   color: #fff;
+}
+
+.bar {
+  border: 1px solid var(--secondary-light);
 }
 
 .logo {
@@ -137,6 +157,7 @@ a:active {
 .top-nav {
   background: #fff;
   border-bottom: 1px solid var(--black-20);
+  box-shadow: var(--shadow-20-bottom);
   height: 50px;
   justify-items: space-between;
   left: 0;
@@ -146,34 +167,116 @@ a:active {
   z-index: 100;
 }
 
+.drop-down {
+  pointer-events: none;
+}
+
 .top-nav li {
   list-style: none;
   margin: 0 10px;
+  position: relative;
   white-space: nowrap;
 }
 
 .top-nav li:first-child {
+  left: 10px;
   margin-left: 0;
+  position: absolute;
 }
 
 .top-nav ul {
   display: flex;
   flex-wrap: wrap;
   padding-left: 0;
-  justify-content: space-between;
+  justify-content: flex-end;
+}
+
+.top-nav li#current-user-pic {
+  margin-right: 0;
+  z-index: 1;
+}
+
+.top-nav li .current-user-pic {
+  border-radius: 50%;
+  height: 32px;
+  margin-right: 0;
+  margin-top: -7px;
+  overflow: hidden;
+  position: relative;
+  width: 32px;
+}
+
+.profile-pic {
+  left: -2px;
+  position: absolute;
+  width: 36px;
+  z-index: 1;
+}
+
+.premium-user {
+  border: 2px solid var(--warning-dark);
+}
+
+.premium-pic-star {
+  bottom: 0;
+  color: var(--warning);
+  font-size: 0.8rem;
+  left: -2px;
+  position: absolute;
+  visibility: visible !important;
+  z-index: 2;
+  text-shadow: 0 0 2px var(--warning-dark);
+} 
+
+.greet {
+  justify-self: flex-end;
+  z-index: 2;
+}
+
+#hidden-select {
+  opacity: 0;
+  position: absolute;
+  right: 0;
+  top: 15px;
+  z-index: 0;
+}
+
+#hidden-select:after {
+  content: '';
+  display: inline-block;
+  height: 30px;
+  left: 50px;
+  position: absolute;
+  top: 0;
+  width: 72px;
+}
+
+#hidden-select select {
+  cursor: pointer;
+}
+
+.visitor-welcome {
+  align-items: center;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+.visitor-welcome h1 {
+  font-size: 2rem;
 }
 
 .card {
+  background-color: #fff;
   border: 1px solid var(--black-10);
   border-radius: 4px;
-  box-shadow: 1px 1px 6px 0 var(--black-20);
+  box-shadow: var(--shadow-20-bottom-right);
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
   transform-origin: center center;
   transition: 0.2s var(--quint-in);
-  width: 320px;
   will-change: transform, box-shadow;
   padding: 0;
 }
@@ -183,15 +286,32 @@ a:active {
   height: 90px;
 }
 
+.card-macro.event {
+  border-radius: 0;
+  height: 100%;
+  margin: 0 !important;
+  width: 100%;
+}
+
+.card-macro.card:hover {
+  transform: scale(1);
+}
+
 .card-micro .card-cover {
+  order: -2;
   width: 72px;
+}
+
+.card-macro .card-cover {
+  background-position: top center;
+  height: 80%;
   order: -2;
 }
 
 .card-micro header {
+  left: 67px;
   position: absolute !important;
   top: -5px;
-  left: 67px;
 }
 
 .card-micro .card-info {
@@ -201,6 +321,10 @@ a:active {
 
 .card-micro .card-info > * {
   margin: 2px 0 !important;
+}
+
+.card-macro .card-info {
+  flex-direction: row;
 }
 
 .card:hover {
@@ -231,6 +355,10 @@ a:active {
 
 .card-micro .card-info i, .card-micro .flag-64 {
   display: none;
+}
+
+.card-macro .flag-64 {
+  top: -32px;
 }
 
 .card-micro .more {
@@ -264,6 +392,7 @@ a:active {
   overflow: hidden;
   right: -24px;
   width: 36px;
+  z-index: 3;
 }
 
 [class|=flag] img {
@@ -325,33 +454,202 @@ a:active {
   background-image: url('https://images.pexels.com/photos/1181472/pexels-photo-1181472.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500');
 }
 
-.openwebnar-cover, .premiumwebnar-cover {
-  background-image: url('https://images.pexels.com/photos/2173508/pexels-photo-2173508.jpeg?auto=compress&cs=tinysrgb&h=650&w=940');
+.webnar-cover {
+  background-image: url('https://blog.zoom.us/wordpress/wp-content/uploads/2019/08/zoom-video-webinar-apps.jpg');
+}
+
+.event-type {
+  align-items: center;
+  background-color: #ffffffdd;
+  bottom: 10px;
+  color: var(--main-light);
+  display: flex;
+  font-size: 1.5rem;
+  height: 30px;
+  justify-content: space-between;
+  left: 0;
+  position: absolute;
+  z-index: 2;
+  width: 100%;
+}
+
+.event-flag {
+  align-items: center;
+  border: 2px solid var(--main-light);
+  background-color: var(--main-light);
+  border-radius: 50%;
+  color: #fff;
+  display: flex;
+  height: 40px;
+  justify-content: center;
+  margin-left: 10px;
+  overflow: hidden;
+  position: relative;
+  width: 40px;
+}
+
+.event-name {
+  color: var(--main-light);
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+.card-micro .event-type {
+  background-color: transparent;
+  top: 0;
+}
+
+.card-micro .event-name {
+  display: none;
+}
+
+.card-micro .event-flag {
+  border: 0;
+  font-size: 1.1rem;
+  height: 25px;
+  margin-left: 5px;
+  width: 25px;
 }
 
 .events {
+  background-color: var(--black-5);
   display: flex;
+  height: 390px;
   flex-wrap: nowrap;
   overflow-x: scroll;
+  overflow-y: visible;
   scrollbar-width: none;
+}
+
+.events::-webkit-scrollbar {
+  display: none;
+}
+
+.events-past {
+  height: max-content;
+}
+
+.events-attending {
+  align-items: flex-end;
+  display: flex;
+  height: 50vh;
+}
+
+.events-empty {
+  align-items: center;
+  background-image: linear-gradient(to bottom right, var(--main), var(--success-light));
+  flex-direction: column;
+  height: max-content;
+  justify-content: center;
+  padding: 30px 0;
+}
+
+.events-empty p {
+  color: #fff;
+  margin: 5px 0;
 }
 
 .event {
   margin: 10px 20px;
   white-space: nowrap;
+  width: 320px;
   overflow: hidden;
 }
 
+@media screen and (-webkit-min-device-pixel-ratio:0) and (min-resolution:.001dpcm) {
+  .event {
+    margin: 0 20px !important;
+  }
+
+  .events {
+    overflow-y: visible;
+    padding: 20px 0;
+  }
+}
+
+.premium-row {
+  align-items: center;
+  background: linear-gradient(to right, var(--warning-dark) 10%, var(--warning-light) 60%);
+  bottom: 5px;
+  box-sizing: border-box;
+  box-sizing: border-box;
+  display: flex;
+  height: 31px;
+  justify-content: space-between;
+  padding: 5px 10px;
+  position: absolute;
+  width: 100%;
+  z-index: 2;
+}
+
+.premium-row span {
+  color: var(--black-95);
+  font-weight: bold;
+  letter-spacing: 0.1rem;
+  opacity: 0.8;
+  text-shadow: 1px 1px var(--warning-dark);
+  text-transform: uppercase;
+}
+
+.premium-row .premium-star {
+  color: var(--warning-dark);
+  font-size: 1.9rem;
+  z-index: 2;
+}
+
+.premium-star-back {
+  color: var(--warning-light);
+  font-size: 2.25rem;
+  left: 7px;
+  position: absolute;
+  top: -3.5px;
+  z-index: 1;
+}
+
+/* 
+leap: <i class="fas fa-rainbow"></i>
+mission: <i class="fas fa-users"></i>
+vanhackathon: <i class="fas fa-laptop-code"></i>
+*/
+
 .modal {
-  position: fixed;
-  top: calc(50vh - 100px);
-  left: calc(50vw - 200px);
-  width: 400px;
-  height: 200px;
+  background-color: #ffffff;
   border: 1px solid grey;
   border-radius: 5px;
-  background-color: #ffffff;
+  left: calc(50vw - 200px);
+  height: max-content;
+  position: fixed;
+  top: calc(50vh - 100px);
+  width: 400px;
   z-index: 1000;
+}
+
+.modal.card {
+  box-shadow: 3px 3px 10px 0 var(--black-70);
+  transition: 0.35s cubic-bezier(0.075, 0.82, 0.165, 1);
+}
+
+.modal.card:hover {
+  transform: scale(1);
+}
+
+.modal .fa-times {
+  color: var(--black-20);
+  cursor: pointer;
+  font-size: 1.1rem;
+  position: absolute;
+  right: 12px;
+  top: 10px;
+  transform: 0.3s var(--quint-in-out);
+}
+
+.modal .fa-times:hover {
+  color: var(--main-light);
+}
+
+.modal-content {
+  margin: 20px 30px;
 }
 
 .cover {
@@ -360,7 +658,7 @@ a:active {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: #00000033;
+  background-color: #00000077;
   z-index: 500;
 }
 
