@@ -52,7 +52,6 @@ const User = (userObj) => {
   return newUser;
 };
 
-// MeetUp, Leap, Recruiting, Mission, VanHackathon, Premium-only Webnar, Open Webnar
 const Event = (eventObj) => {
   const {
     type, title, description, location, date, deadLine, premium, country,
@@ -115,7 +114,7 @@ const winona = User({
   firstName: 'Winona', lastName: 'Rider', premium: true, picture: 'https://img-static.tradesy.com/item/24264036/ray-ban-multi-frame-and-demo-lens-women-rectangular-eyeglasses-1-1-960-960.jpg', email: 'charchar@mail.com',
 });
 
-const description = '      Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum quos inventore cum quia obcaecati dolore esse ratione dicta architecto hic provident, nam, impedit eum nisi quisquam veniam. Quibusdam, consequatur distinctio!';
+const description = 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum quos inventore cum quia obcaecati dolore esse ratione dicta architecto hic provident, nam, impedit eum nisi quisquam veniam. Quibusdam, consequatur distinctio!';
 
 const recruitment = Event({
   type: 'Leap', premium: false, title: 'Leap into', description, country: 'UK', location: 'Sao Paulo', date: new Date(Date.UTC(2020, 1, 10, 15, 0, 0, 0)), deadLine: 'Mon 1 2020',
@@ -149,6 +148,57 @@ const closeModal = (cover, modal) => {
   document.getElementById(modal).classList.add('hidden');
 };
 
+const eventComponent = (event, past = false, attending = false, thumbnail = false) => {
+  const {
+    type, premium, id, title, date, location, deadLine, country,
+  } = event;
+
+  const onClick = thumbnail ? `featureEvent(${id})` : `attendingDetails(${id})`;
+
+  return (
+    `<article class='event ${past && !attending ? 'card-micro' : ''} ${attending ? 'card-macro' : ''} card ${type}-event ${premium ? 'premium-event' : ''}' onclick=${onClick} data-event='${id}' id='${id}'>
+    <header>
+      <h2 class='title'>${title}</h2>
+      <figure class='flag-64'>
+        <img alt='${country} flag' src='https://www.countryflags.io/${country.toLowerCase()}/flat/64.png'>
+      </figure>
+    </header>
+    <div class='card-cover ${type.toLowerCase()}-cover'>
+    ${premium
+      ? `<div class='premium-row'>
+      <i class='fa fa-star premium-star'></i>
+      <i class='fa fa-star premium-star-back'></i>
+      <span>Premium-only</span>
+    </div>`
+      : (['leap', 'mission', 'vanhackathon'].includes(type.toLowerCase()) ? `<div class='event-type'>
+        <div class='event-flag'>
+          ${type.toLowerCase() === 'leap' ? `<i class="fas fa-rainbow"></i>` : ''}
+
+          ${type.toLowerCase() === 'mission' ? `<i class="fas fa-users"></i>` : ''}
+
+          ${type.toLowerCase() === 'vanhackathon' ? `<i class="fas fa-laptop-code"></i>` : ''}
+        </div>
+        <span class='event-name'>${type}</span>
+      </div>` : '')}
+    </div>
+    <div class='card-info'>
+      <p class='info-top'><time class='event-date' datetime='${date}'>${date.toDateString()}</time> <span>${type}</span></p>
+      <span><i class="fas fa-map-marker-alt"></i>${location}</span>
+      ${!past ? `<span><i class="far fa-calendar-alt"></i> Deadline: <time datetime='${deadLine}'>${deadLine}</time></span>
+      <div class='button-row'>
+        ${attending ? `<button class='aplication-btn button-default' data-event='${id}' type='button'>See Application</button>`
+      : `<button class='apply-btn button-default' data-event='${id}' type='button'>APPLY</button>` }
+        <a class="twitter-share-button"
+        href="https://twitter.com/intent/tweet?text=Check%20out%20this%20VanHack%20event%20at%20link"
+        data-size="large">
+        <i class="fas fa-share-alt"></i></a>
+      </div>
+    </div>`
+      : '</div> <a class="more" href="#"><i class="fas fa-ellipsis-v"></i></a>'}
+    </article>`
+  );
+};
+
 const attendingDetails = (key) => {
   const eventContainer = document.getElementById('events');
   const {
@@ -180,8 +230,22 @@ const attendingDetails = (key) => {
 
   modal.style.top = '0';
   modal.classList.remove('hidden');
-  modal.style.top = `${(document.body.clientHeight / 2) - (modal.clientHeight / 1.25)}px`;
+  modal.style.top = `${(document.body.clientHeight / 2) - (modal.clientHeight)}px`;
   document.getElementById('doc-cover').classList.remove('hidden');
+};
+
+const featureEvent = (key) => {
+  const featuredEvent = document.getElementById('my-events');
+
+  featuredEvent.innerHTML = eventComponent(Db.events[key], false, true);
+
+  [...document.getElementsByClassName('attending-next-thumb')].forEach((thumb) => {
+    if (thumb.getAttribute('name') * 1 === key * 1) {
+      thumb.classList.add('selected');
+    } else {
+      thumb.classList.remove('selected');
+    }
+  });
 };
 
 const tempMessage = (element, message, type = 'warn') => {
@@ -193,10 +257,9 @@ const tempMessage = (element, message, type = 'warn') => {
   setTimeout(() => {
     element.classList.add('leave');
     element.classList.remove('show');
-  }, 5000);
+  }, 3500);
 };
 
-// / DOM STUFF
 window.onload = () => {
   const userGreet = document.getElementById('current-user-greet');
   const userPic = document.getElementById('current-user-pic');
@@ -209,71 +272,22 @@ window.onload = () => {
 
   const populateEvents = (user) => {
     const events2Show = {
+      attending: [],
       main: [],
       past: [],
     };
-
-    for (const key in Db.events) {
+    Object.keys(Db.events).forEach((key) => {
       if (key !== 'nextId') {
         if (user && user.events.includes(key)) {
-          events2Show.main.push({ ...Db.events[key], container: applyedEvents });
+          events2Show.attending.push({ ...Db.events[key], container: applyedEvents });
         } else if (Db.events[key].date.getTime() >= Date.now()) {
           events2Show.main.push({ ...Db.events[key], container: eventContainer });
         } else {
           events2Show.past.push({ ...Db.events[key], container: pastEventContainer });
         }
       }
-    }
+    });
     return events2Show;
-  };
-
-  const eventComponent = (event, past = false, attending = false) => {
-    const {
-      type, premium, id, title, date, location, deadLine, country,
-    } = event;
-    // MeetUp, Leap, Recruiting, Mission, VanHackathon, Premium-only Webnar, Open Webnar
-    return (
-      `<article class='event ${past && !attending ? 'card-micro' : ''} ${attending ? 'card-macro' : ''} card ${type}-event ${premium ? 'premium-event' : ''}' onclick='attendingDetails(${id})' data-event='${id}' id='${id}'>
-      <header>
-        <h2 class='title'>${title}</h2>
-        <figure class='flag-64'>
-          <img alt='${country} flag' src='https://www.countryflags.io/${country.toLowerCase()}/flat/64.png'>
-        </figure>
-      </header>
-      <div class='card-cover ${type.toLowerCase()}-cover'>
-      ${premium
-        ? `<div class='premium-row'>
-        <i class='fa fa-star premium-star'></i>
-        <i class='fa fa-star premium-star-back'></i>
-        <span>Premium-only</span>
-      </div>`
-        : (['leap', 'mission', 'vanhackathon'].includes(type.toLowerCase()) ? `<div class='event-type'>
-          <div class='event-flag'>
-            ${type.toLowerCase() === 'leap' ? `<i class="fas fa-rainbow"></i>` : ''}
-
-            ${type.toLowerCase() === 'mission' ? `<i class="fas fa-users"></i>` : ''}
-
-            ${type.toLowerCase() === 'vanhackathon' ? `<i class="fas fa-laptop-code"></i>` : ''}
-          </div>
-          <span class='event-name'>${type}</span>
-        </div>` : '')}
-      </div>
-      <div class='card-info'>
-        <time class='event-date' datetime='${date}'>${date.toDateString()}</time>
-        <span><i class="fas fa-map-marker-alt"></i>${location}</span>
-        ${!past ? `<span><i class="far fa-calendar-alt"></i> Deadline: <time datetime='${deadLine}'>${deadLine}</time></span>
-        <div class='button-row'>
-          ${attending ? `<button class='aplication-btn button-default' data-event='${id}' type='button'>See Application</button>`
-        : `<button class='apply-btn button-default' data-event='${id}' type='button'>APPLY</button>` }
-          <a class="twitter-share-button"
-          href="https://twitter.com/intent/tweet?text=Check%20out%20this%20VanHack%20event%20at%20link"
-          data-size="large">
-          <i class="fas fa-share-alt"></i></a>
-        </div>
-      </div>`
-        : '</div> <a class="more" href="#"><i class="fas fa-ellipsis-v"></i></a>'}
-      </article>`
-    );
   };
 
   const emptyNoteComponent = (container) => {
@@ -299,12 +313,25 @@ window.onload = () => {
             logged().events.push(btn.dataset.event);
             document.getElementById(`${btn.dataset.event}`).remove();
 
+            if (eventContainer.childElementCount === 0) {
+              eventContainer.classList.add('empty');
+              eventContainer.innerHTML = '<p>There are no remaining events to apply</p><p>check again later... <i class="fas fa-frog"></i></p>';
+            }
+
             if (applyedEvents.classList.contains('events-empty')) {
               applyedEvents.classList.remove('events-empty');
               applyedEvents.innerHTML = '';
+              applyedEvents.innerHTML = eventComponent(event, false, true);
+              document.getElementById('attending-next').classList.remove('hidden');
             }
 
-            applyedEvents.innerHTML += eventComponent(event, false, true);
+            [...document.getElementsByClassName('attending-next-thumb')].some((thumb) => {
+              if (thumb.childElementCount === 0) {
+                thumb.innerHTML = eventComponent(event, false, true, true);
+                thumb.setAttribute('name', event.id);
+                return true;
+              }
+            });
             tempMessage(alertContainer, `<i class="fas fa-check-circle"></i> You are now taking part at ${event.title}`, 'success');
           }
         }
@@ -322,9 +349,10 @@ window.onload = () => {
     return 0;
   });
 
-  const addEvents2Dom = ({ main, past }) => {
+  const addEvents2Dom = ({ attending, main, past }) => {
     const eventContainer = document.getElementById('events');
     const pastEventContainer = document.getElementById('past-events');
+    const applyedList = document.getElementsByClassName('attending-next-thumb');
     applyedEvents.innerHTML = '';
     eventContainer.innerHTML = '';
     pastEventContainer.innerHTML = '';
@@ -334,22 +362,44 @@ window.onload = () => {
     });
 
     main.forEach((event) => {
-      event.container.innerHTML += eventComponent(event, false, event.container === applyedEvents && true);
+      eventContainer.innerHTML += eventComponent(event, false, event.container === applyedEvents && true);
+    });
+
+    [...applyedList].forEach((thumb) => {
+      thumb.innerHTML = '';
+      thumb.classList = 'attending-next-thumb';
+    });
+
+    attending.forEach((event, i) => {
+      if (i === 0) {
+        applyedEvents.innerHTML = eventComponent(event, false, event.container === applyedEvents && true);
+      }
+      [...applyedList][i].innerHTML += eventComponent(event, false, event.container === applyedEvents && true, true);
+      [...applyedList][i].setAttribute('name', event.id);
     });
 
     if (applyedEvents.childElementCount === 0) {
       applyedEvents.classList.add('events-empty');
       applyedEvents.innerHTML = emptyNoteComponent('applied');
+      document.getElementById('attending-next').classList.add('hidden');
     } else {
       applyedEvents.classList.remove('events-empty');
+      document.getElementById('attending-next').classList.remove('hidden');
+    }
+
+    if (eventContainer.childElementCount === 0) {
+      eventContainer.classList.add('empty');
+      eventContainer.innerHTML = '<p>There are no remaining events to apply</p><p>check again later... <i class="fas fa-frog"></i></p>';
     }
   };
 
   const events = populateEvents(loggedUser.logged());
   const sortedEvents = {
+    attending: sortEvents(events.attending, 1),
     main: sortEvents(events.main, 1),
     past: sortEvents(events.past, -1),
   };
+
   addEvents2Dom(sortedEvents);
 
   addEvent2Btns();
@@ -383,16 +433,19 @@ window.onload = () => {
       </select>`;
       changeUser.innerHTML = `<i class="fas fa-caret-down"></i>`;
       const currentEvents = populateEvents(user);
-      const sortedEvents = {
+      const sorEvents = {
+        attending: sortEvents(currentEvents.attending, 1),
         main: sortEvents(currentEvents.main, 1),
         past: sortEvents(currentEvents.past, -1),
       };
 
-      addEvents2Dom(sortedEvents);
+      addEvents2Dom(sorEvents);
       addEvent2Btns();
       populateUsers();
       addEventToUserSelect();
     } else {
+      hiddenSelect.innerHTML = '';
+      applyedEvents.classList.add('events-empty');
       userGreet.innerHTML = 'Hi, visitor';
       userPic.innerHTML = '';
       changeUser.innerHTML = '';
@@ -404,6 +457,7 @@ window.onload = () => {
         </select>
       </article>`;
       populateUsers();
+      addEventToUserSelect();
     }
   };
 
