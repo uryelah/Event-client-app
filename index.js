@@ -269,6 +269,19 @@ window.onload = () => {
   const applyedEvents = document.getElementById('my-events');
   const alertContainer = document.getElementById('alert');
   const pastEventContainer = document.getElementById('past-events');
+  const loader = document.getElementById('loader');
+
+  const loaderOn = () => {
+    loader.classList.remove('load-over');
+  }; 
+
+  const loaderOver = (time) => {
+    setTimeout(() => {
+      loader.classList.add('load-over');
+    }, time);
+  };
+
+  loaderOver(1600);
 
   const populateEvents = (user) => {
     const events2Show = {
@@ -416,6 +429,8 @@ window.onload = () => {
   const addEventToUserSelect = () => {
     Array.from(document.getElementById('user-select').querySelectorAll('.user')).forEach((user) => {
       user.addEventListener('click', () => {
+        loaderOn();
+        loaderOver(2000);
         const clickedUser = Db.users[user.dataset.user];
         loggedUser.login(clickedUser);
         checkLoggedUser();
