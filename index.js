@@ -44,6 +44,7 @@ const User = (userObj) => {
     premium,
     email,
     events,
+    CTAcount: 0,
   };
 
   Db.users[id] = newUser;
@@ -144,8 +145,11 @@ const recruitment2 = Event({
 });
 
 const closeModal = (cover, modal) => {
+  const modal2Close = document.getElementById(modal);
+  modal2Close.classList.add('hidden');
+  modal2Close.style.top = '-800px';
+  modal2Close.classList.remove('modal-message');
   document.getElementById(cover).classList.add('hidden');
-  document.getElementById(modal).classList.add('hidden');
 };
 
 const eventComponent = (event, past = false, attending = false, thumbnail = false) => {
@@ -154,6 +158,17 @@ const eventComponent = (event, past = false, attending = false, thumbnail = fals
   } = event;
 
   const onClick = thumbnail ? `featureEvent(${id})` : `attendingDetails(${id})`;
+
+  const socialLinks = `<div class="tooltip tooltip-row">
+    <a class="twitter-share-button"
+    href="https://twitter.com/intent/tweet?text=Check%20out%20this%20VanHack%20event%20at%20link"
+    data-size="large">
+      <i class="fab fa-twitter"></i></a>
+    </a>
+    <a href="#">
+      <i class="fab fa-linkedin"></i>
+    </a>
+    </div>`;
 
   return (
     `<article class='event ${past && !attending ? 'card-micro' : ''} ${attending ? 'card-macro' : ''} card ${type}-event ${premium ? 'premium-event' : ''}' onclick=${onClick} data-event='${id}' id='${id}'>
@@ -188,10 +203,10 @@ const eventComponent = (event, past = false, attending = false, thumbnail = fals
       <div class='button-row'>
         ${attending ? `<button class='aplication-btn button-default' data-event='${id}' type='button'>See Application</button>`
       : `<button class='apply-btn button-default' data-event='${id}' type='button'>APPLY</button>` }
-        <a class="twitter-share-button"
-        href="https://twitter.com/intent/tweet?text=Check%20out%20this%20VanHack%20event%20at%20link"
-        data-size="large">
-        <i class="fas fa-share-alt"></i></a>
+        <div class="tooltip-owner">
+          <i class="fas fa-share-alt"></i>
+          ${socialLinks}
+        </div>
       </div>
     </div>`
       : '</div> <a class="more" href="#"><i class="fas fa-ellipsis-v"></i></a>'}
@@ -200,7 +215,6 @@ const eventComponent = (event, past = false, attending = false, thumbnail = fals
 };
 
 const attendingDetails = (key) => {
-  const eventContainer = document.getElementById('events');
   const {
     country, type, title, premium, date, location, description, container, deadLine,
   } = Db.events[key];
@@ -225,14 +239,51 @@ const attendingDetails = (key) => {
     href="https://twitter.com/intent/tweet?text=Im%20going%20to%20the%20VanHack%20event%20at%20link"
     data-size="large">
     <i class="fab fa-twitter"></i></a>
+    <a href="#"><i class="fab fa-linkedin"></i></a>
   </div>
   `;
 
-  modal.style.top = '0';
   modal.classList.remove('hidden');
-  modal.style.top = `${(document.body.clientHeight / 2) - (modal.clientHeight)}px`;
   document.getElementById('doc-cover').classList.remove('hidden');
+  setTimeout(() => {
+    modal.style.top = '100px';
+    modal.style.left = `${(document.body.clientWidth / 2) - (modal.clientWidth / 2)}px`;
+  }, 300);
 };
+
+const openPremiumModal = () => {
+  const modal = document.getElementById('event-modal');
+
+  modal.querySelector('.modal-content').innerHTML = `
+  <article class='premium-modal'>
+    <header class='premium-image'>
+      <h2>
+        <svg class="ico-svg" aria-hidden="true" focusable="false" data-prefix="far" data-icon="lock" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="svg-inline--fa fa-lock fa-w-14 fa-2x"><path fill="currentColor" d="M400 192h-32v-46.6C368 65.8 304 .2 224.4 0 144.8-.2 80 64.5 80 144v48H48c-26.5 0-48 21.5-48 48v224c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V240c0-26.5-21.5-48-48-48zm-272-48c0-52.9 43.1-96 96-96s96 43.1 96 96v48H128v-48zm272 320H48V240h352v224z" class=""></path></svg>
+        This is a premium exclusive event
+      </h2>
+      <button class="button-default button-premium"><i class="fa fa-star"></i>Gain access</button>
+    </header>
+    <div class='premium-description'>
+      <h3>Vanhack premium acount</h3>
+      <p>
+        One of many perks of having being a premium Vanhack user is the access to premium webnars that give you insider access to the best international companies recruiting proccesses.
+      </p>
+      <p><a href='#'>Find out more.</a></p>
+    </div>
+  </article>
+  `;
+
+  modal.classList.add('modal-message');
+  modal.classList.remove('hidden');
+  document.getElementById('doc-cover').classList.remove('hidden');
+
+  setTimeout(() => {
+    modal.style.top = '100px';
+    modal.style.left = `${(document.body.clientWidth / 2) - (modal.clientWidth / 2)}px`;
+  }, 300);
+};
+
+const emptyThumbComponent = () => `<article class="attending-next-thumb"></article>`;
 
 const featureEvent = (key) => {
   const featuredEvent = document.getElementById('my-events');
@@ -258,6 +309,34 @@ const tempMessage = (element, message, type = 'warn') => {
     element.classList.add('leave');
     element.classList.remove('show');
   }, 3500);
+};
+
+const emptyNoteComponent = (container) => {
+  if (container === 'applied') {
+    return `<p>You haven't applied to any event yet.</p>
+    <p>Find an event to attend below <i class="far fa-hand-point-down"></i></p>`
+  }
+};
+
+const selectComponent = () => {
+  return `<div class="tooltip-owner user-selector" name="users" id="user-select">
+  <i class="fas fa-chevron-down"></i>
+  <div class="tooltip tooltip-column">
+    <a href='#' class='user' data-user='-1' default>Visitor</a>
+  </div>
+  </div>`;
+};
+
+const welcomeComponent = () => {
+  return `<article class='visitor-welcome'>
+  <h1>Welcome to the events app!</h1>
+  <p>Please, select one of the users below to login.</p>
+  ${selectComponent()}
+</article>`;
+};
+
+const emptyEvents = () => {
+  return '<p>There are no remaining events to apply</p><p>check again later... <i class="fas fa-frog"></i></p>';
 };
 
 window.onload = () => {
@@ -303,13 +382,6 @@ window.onload = () => {
     return events2Show;
   };
 
-  const emptyNoteComponent = (container) => {
-    if (container === 'applied') {
-      return `<p>You haven't applied to any event yet.</p>
-      <p>Find an event to attend below <i class="far fa-hand-point-down"></i></p>`
-    }
-  };
-
   const addEvent2Btns = () => {
     Array.from(document.getElementsByClassName('apply-btn')).forEach((btn) => {
       btn.addEventListener('click', (e) => {
@@ -317,18 +389,26 @@ window.onload = () => {
         const { logged } = loggedUser;
         const curUser = logged();
         if (!loggedUser.logged()) {
-          tempMessage(alertContainer, '<i class="fas fa-exclamation-triangle"></i> Login first to apply');
+          tempMessage(alertContainer, '<i class="fas fa-exclamation-triangle"></i> Login first to apply', 'error');
         } else {
           const newAttending = UserEvent({ userId: curUser.id, eventId: btn.dataset.event });
           if (newAttending === 'NOT_PREMIUM_ERROR') {
-            tempMessage(alertContainer, '<i class="fas fa-exclamation-triangle"></i> Sorry, this even is for premium users only. <a href="#">Learn more about premium memberships</a>');
+            curUser.CTAcount += 1;
+
+            if (curUser.CTAcount > 2) {
+              tempMessage(alertContainer, '<i class="fas fa-exclamation-triangle"></i> Sorry, this even is for premium users only. <a href="#">Learn more about premium memberships</a>');
+            } else {
+              openPremiumModal();
+            }
           } else if (newAttending !== 'ALREADY_APPLYED_ERROR') {
             logged().events.push(btn.dataset.event);
             document.getElementById(`${btn.dataset.event}`).remove();
 
             if (eventContainer.childElementCount === 0) {
               eventContainer.classList.add('empty');
-              eventContainer.innerHTML = '<p>There are no remaining events to apply</p><p>check again later... <i class="fas fa-frog"></i></p>';
+              eventContainer.innerHTML = emptyEvents();
+            } else {
+              eventContainer.classList.remove('empty');
             }
 
             if (applyedEvents.classList.contains('events-empty')) {
@@ -345,6 +425,9 @@ window.onload = () => {
                 return true;
               }
             });
+
+            document.getElementById('attending-next').innerHTML += emptyThumbComponent();
+
             tempMessage(alertContainer, `<i class="fas fa-check-circle"></i> You are now taking part at ${event.title}`, 'success');
           }
         }
@@ -365,6 +448,7 @@ window.onload = () => {
   const addEvents2Dom = ({ attending, main, past }) => {
     const eventContainer = document.getElementById('events');
     const pastEventContainer = document.getElementById('past-events');
+    const applyedListParent = document.getElementById('attending-next');
     const applyedList = document.getElementsByClassName('attending-next-thumb');
     applyedEvents.innerHTML = '';
     eventContainer.innerHTML = '';
@@ -383,6 +467,7 @@ window.onload = () => {
       thumb.classList = 'attending-next-thumb';
     });
 
+    applyedListParent.innerHTML = `<h3 class="max-1200">My events</h3>${emptyThumbComponent().repeat(attending.length + 1)}`;
     attending.forEach((event, i) => {
       if (i === 0) {
         applyedEvents.innerHTML = eventComponent(event, false, event.container === applyedEvents && true);
@@ -402,7 +487,9 @@ window.onload = () => {
 
     if (eventContainer.childElementCount === 0) {
       eventContainer.classList.add('empty');
-      eventContainer.innerHTML = '<p>There are no remaining events to apply</p><p>check again later... <i class="fas fa-frog"></i></p>';
+      eventContainer.innerHTML = emptyEvents();
+    } else {
+      eventContainer.classList.remove('empty');
     }
   };
 
@@ -421,8 +508,18 @@ window.onload = () => {
     for (const key in Db.users) {
       const { id, firstName, premium } = Db.users[key];
       if (key !== 'nextId') {
-        document.getElementById('user-select').innerHTML += `<option class='user' data-user=${id}>${firstName}(${premium ? 'premium' : 'regular'})</option>`;
+        document.getElementById('user-select').querySelector('.tooltip').innerHTML += `<a class='user' data-user=${id}>${firstName} (${premium ? 'premium' : 'regular'})</a>`;
       }
+    }
+
+    if (document.getElementById('change-user').childElementCount > 0) {
+      document.getElementById('change-user').addEventListener('click', e => {
+        document.getElementById('user-select').toggle('user-selector-open');
+      });
+    } else {
+      document.getElementById('user-select').addEventListener('click', e => {
+        e.target.classList.toggle('user-selector-open');
+      });
     }
   };
 
@@ -443,9 +540,7 @@ window.onload = () => {
     if (user) {
       userGreet.innerHTML = `Welcome, ${user.firstName}`;
       userPic.innerHTML = `${user.premium ? '<i class="fa fa-star premium-pic-star"></i><div class="premium-user ' : '<div class="'}current-user-pic"><img class='profile-pic' src='${user.picture}' alt='profile-image'/></div>`;
-      hiddenSelect.innerHTML = `<select name="users" id="user-select">
-      <option class='user' data-user='-1' default>--</option>
-      </select>`;
+      hiddenSelect.innerHTML = selectComponent();
       changeUser.innerHTML = `<i class="fas fa-caret-down"></i>`;
       const currentEvents = populateEvents(user);
       const sorEvents = {
@@ -461,16 +556,10 @@ window.onload = () => {
     } else {
       hiddenSelect.innerHTML = '';
       applyedEvents.classList.add('events-empty');
-      userGreet.innerHTML = 'Hi, visitor';
+      userGreet.innerHTML = 'Hi, Visitor';
       userPic.innerHTML = '';
       changeUser.innerHTML = '';
-      applyedEvents.innerHTML = `<article class='visitor-welcome'>
-        <h1>Welcome to the events app!</h1>
-        <p>Please, select one of the users below to login.</p>
-        <select name="users" id="user-select">
-        <option class='user' data-user='-1' default>--</option>
-        </select>
-      </article>`;
+      applyedEvents.innerHTML = welcomeComponent();
       populateUsers();
       addEventToUserSelect();
     }

@@ -11,6 +11,9 @@
   --black-80: #3b4146;
   --black-90: #292e33;
   --black-95: #151516;
+  --danger-light: #ff6161;
+  --danger: #d93131;
+  --danger-dark: #b30e0e;
   --main-light: #2c9bf5;
   --main: #0675ce;
   --main-dark: #00569c;
@@ -75,12 +78,13 @@ p, span, li, time {
   color: var(--black-40);
 }
 
-a {
+a, .tooltip-owner {
   color: var(--main);
+  cursor: pointer;
   transition: 0.2s var(--quint-in-out);
 }
 
-a:hover {
+a:hover, .tooltip-owner:hover {
   color: var(--main-light);
 }
 
@@ -130,6 +134,11 @@ a:active {
 
 .alert-success {
   background-color: var(--success);
+  color: #fff;
+}
+
+.alert-error {
+  background-color: var(--danger);
   color: #fff;
 }
 
@@ -603,7 +612,7 @@ a:active {
   display: flex;
   flex-wrap: nowrap;
   height: 100px;
-  justify-content: space-between;
+  justify-content: flex-start;
   overflow-x: scroll;
   padding-top: calc(20px + 1rem);
   position: relative;
@@ -792,12 +801,6 @@ a:active {
   z-index: 1;
 }
 
-/* 
-leap: <i class="fas fa-rainbow"></i>
-mission: <i class="fas fa-users"></i>
-vanhackathon: <i class="fas fa-laptop-code"></i>
-*/
-
 .modal {
   background-color: #ffffff;
   border: 1px solid grey;
@@ -805,9 +808,13 @@ vanhackathon: <i class="fas fa-laptop-code"></i>
   left: calc(50vw - 200px);
   height: max-content;
   position: fixed;
-  top: calc(50vh - 100px);
+  top: -800px;
   width: 400px;
   z-index: 1000;
+}
+
+.modal-close {
+  z-index: 10;
 }
 
 .social-media {
@@ -836,10 +843,86 @@ vanhackathon: <i class="fas fa-laptop-code"></i>
 
 .modal .fa-times:hover {
   color: var(--main-light);
+  z-index: 10;
 }
 
 .modal-content {
   margin: 20px 30px;
+}
+
+.ico-svg {
+  width: 1rem;
+}
+
+.modal-message.modal {
+  overflow: hidden;
+  width: 650px;
+}
+
+.modal-message.modal .modal-content {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+.premium-modal {
+  width: 100%;
+}
+
+.modal .modal-content .premium-image {
+  align-items: flex-end;
+  background-image: linear-gradient(to bottom, transparent 30%, #2c9bfa55, var(--main-dark)), url('https://cocreate.ie/wp-content/uploads/2016/12/Depositphotos_73022225_m-2015.jpg');
+  background-position: center top;
+  color: #fff;
+  display: flex;
+  height: 350px;
+  justify-content: space-between;
+  margin: 0 0 10px 0;
+  padding: 5px 20px;
+  position: relative;
+}
+
+.premium-image button {
+  margin: 10px 0;
+}
+
+.button-premium {
+  background: linear-gradient(to bottom, var(--warning-light), var(--warning-dark));
+  border: 2px solid var(--warning-dark);
+  box-shadow: 1px 1px 5px 0 var(--warning-light);
+  color: var(--black-90);
+  font-size: 1.1rem;
+  font-weight: bold;
+  text-shadow: 1px 1px 1px var(--warning-light);
+}
+
+.button-premium .fa-star {
+  color: var(--warning-dark);
+}
+
+.button-premium:hover .fa-star {
+  color: var(--warning-light);
+}
+
+.button-premium:hover {
+  background: linear-gradient(to bottom, var(--warning-dark), var(--warning-light));
+  border: 2px solid var(--warning-light);
+  color: var(--black-90);
+  text-shadow: 1px 1px 1px var(--warning-dark);
+}
+
+.button-premium:active {
+  color: var(--warning-dark);
+  text-shadow: -1px -1px 1px var(--warning-light);
+}
+
+.button-premium:active .fa-star {
+  color: var(--warning-dark);
+}
+
+.premium-description {
+  box-sizing: border-box;
+  padding: 25px 25px 50px 25px;
 }
 
 .cover {
@@ -910,6 +993,113 @@ vanhackathon: <i class="fas fa-laptop-code"></i>
 .app-footer .logo {
   fill: var(--main);
   margin-top: 5px;
+}
+
+/* TOOLTIPS */
+.tooltip-owner {
+  position: relative;
+}
+
+.tooltip {
+  align-items: center;
+  background-color: #fff;
+  border: 1px solid var(--black-20);
+  border-radius: 4px;
+  box-shadow: var(--shadow-20-bottom);
+  display: none;
+  position: absolute;
+  right: -1rem;
+  top: 1.5rem;
+}
+
+.tooltip-row {
+  flex-direction: row;
+  padding: 2px;
+}
+
+.tooltip-row > * {
+  margin: 3px 2px;
+}
+
+.tooltip-column {
+  flex-direction: column;
+  padding: 5px 4px;
+}
+
+.tooltip-column > * {
+  padding: 8px 4px;
+  width: 100%;
+}
+
+.tooltip-column > * + * {
+  border-top: 1px solid var(--black-10);
+}
+
+.tooltip-owner:hover .tooltip {
+  display: flex;
+}
+
+/* USER SELECTOR */
+.user-selector {
+  align-items: center;
+  background-color: var(--black-5);
+  border-radius: 15px;
+  box-shadow: inset 2px 2px 1px 0  var(--black-10), inset -2px -3px 0 0 #fff;
+  box-sizing: border-box;
+  display: flex;
+  height: 32px;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding: 8px 10px 8px 20px;
+  width: 200px;
+}
+
+.user-selector::before {
+  color: var(--black-10);
+  content: 'Visitor';
+}
+
+.user-selector-open.user-selector::before {
+  content: '';
+}
+
+.user-selector-open {
+  box-shadow: inset 2px 2px 1px 0 #fff, inset -2px -3px 0 0 var(--black-10);
+}
+
+.user-selector-open .tooltip {
+  display: flex;
+}
+
+.user-selector:hover .tooltip {
+  display: none;
+}
+
+.user-selector-open:hover .tooltip {
+  display: flex;
+}
+
+.user-selector .tooltip {
+  box-sizing: border-box;
+  font-weight: bold;
+  left: 0;
+  text-align: left;
+  top: 38px;
+  width: 100%;
+  z-index: 20;
+}
+
+.user-selector .tooltip a {
+  box-sizing: border-box;
+  cursor: pointer;
+  padding-left: 20px;
+  text-decoration: none;
+  transition: 0.2s ease-in;
+  width: 100%;
+}
+
+.user-selector .tooltip a:hover {
+  background-color: var(--black-5);
 }
 
 /* LOADER */
