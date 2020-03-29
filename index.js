@@ -108,40 +108,54 @@ const UserEvent = (joinObj) => {
   return newJoin;
 };
 
-const charly = User({
+User({
   firstName: 'Charly', lastName: 'Adamns', premium: false, picture: 'https://www.shuttertalk.com/wp-content/uploads/2019/02/Photography-with-glasses.jpg', email: 'charchar@mail.com',
 });
-const winona = User({
+User({
   firstName: 'Winona', lastName: 'Rider', premium: true, picture: 'https://img-static.tradesy.com/item/24264036/ray-ban-multi-frame-and-demo-lens-women-rectangular-eyeglasses-1-1-960-960.jpg', email: 'charchar@mail.com',
 });
 
+const types = ['Meetup', 'Leap', 'Recruiting', 'Mission', 'Vanhackathon', 'Webinar'];
+const countries = [['CA', 'Canada'], ['US', 'America'], ['HK', 'Hong Kong'], ['FR', 'France'], ['IS', 'Iceland'], ['JP', 'Japan'], ['PL', 'Poland'], ['CH', 'Switzerland']];
+const locations = ['online', 'Lagos', 'Sao Paulo', 'Mexico city', 'Bangalore', 'Calcuta', 'Buenos Aires'];
 const description = 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Ipsum quos inventore cum quia obcaecati dolore esse ratione dicta architecto hic provident, nam, impedit eum nisi quisquam veniam. Quibusdam, consequatur distinctio!';
+let type;
+let days;
+let date;
+let deadLine;
+let country;
+let local;
+let title;
+let premium = false;
+for (let i = 0; i < 25; i += 1) {
+  type = types[Math.floor(Math.random() * types.length)];
+  country = countries[Math.floor(Math.random() * countries.length)];
+  local = locations[Math.floor(Math.random() * locations.length)];
+  date = new Date(Date.UTC(2020, Math.floor(Math.random() * 11), Math.floor((Math.random() * 27) + 1), 15, 0, 0, 0));
+  days = 60 * 60 * 24 * 1000 * (Math.floor(Math.random() * 30) + 1);
+  deadLine = new Date(date.getTime() + days);
+  title = `${country[1]} ${type} event`;
 
-const recruitment = Event({
-  type: 'Leap', premium: false, title: 'Leap into', description, country: 'UK', location: 'Sao Paulo', date: new Date(Date.UTC(2020, 1, 10, 15, 0, 0, 0)), deadLine: 'Mon 1 2020',
-});
-const recruitment1 = Event({
-  type: 'Mission', premium: false, title: 'Leap into', description, country: 'CA', location: 'Sao Paulo', date: new Date(Date.UTC(2020, 2, 10, 15, 0, 0, 0)), deadLine: 'Mon 1 2020',
-});
+  if (type === 'Webinar' && Math.random() > 0.5) {
+    premium = true;
+  } else {
+    premium = false;
+  }
+
+  Event({
+    type,
+    premium,
+    title,
+    description,
+    country: country[0],
+    location: local,
+    date,
+    deadLine: deadLine.toDateString(),
+  });
+}
 
 Event({
-  type: 'Recruiting', premium: false, title: 'Leap into', description, country: 'CA', location: 'Sao Paulo', date: new Date(Date.UTC(2020, 4, 10, 15, 0, 0, 0)), deadLine: 'Mon 1 2020',
-});
-
-Event({
-  type: 'Meetup', premium: false, title: 'Leap into', description, country: 'CA', location: 'Sao Paulo', date: new Date(Date.UTC(2020, 5, 10, 15, 0, 0, 0)), deadLine: 'Mon 1 2020',
-});
-
-Event({
-  type: 'Webinar', premium: false, title: 'Leap into', description, country: 'CA', location: 'Sao Paulo', date: new Date(Date.UTC(2020, 8, 10, 15, 0, 0, 0)), deadLine: 'Mon 1 2020',
-});
-
-
-const mission = Event({
-  type: 'Webinar', premium: true, title: 'Latin America', description, country: 'US', location: 'Sao Paulo', date: new Date(Date.UTC(2020, 3, 21, 11, 0, 0, 0)), deadLine: 'Mon 1 2020',
-});
-const recruitment2 = Event({
-  type: 'Vanhackathon', premium: false, title: 'Leap into Canada', description, country: 'CA', location: 'Sao Paulo', date: new Date(Date.UTC(2020, 5, 10, 15, 0, 0, 0)), deadLine: 'Mon 1 2020',
+  type: 'Webinar', premium: true, title: 'Premium webnar', description, country: 'US', location: 'Sao Paulo', date: new Date(Date.UTC(2020, 3, 21, 11, 0, 0, 0)), deadLine: 'Mon 1 2020',
 });
 
 const tweetEvent = (e) => {
@@ -157,25 +171,30 @@ const closeModal = (cover, modal) => {
   document.getElementById(cover).classList.add('hidden');
 };
 
+const socialLinks = (id, title, type) => {
+  const tweet = `I'm going to Vanhack ${title} ${type}. Come with me, check it out at https://vanhack.com/platform/#/events`
+  const linkedin = `${id}_${title}`;
+
+  return `<a class="twitter-share-button" target="_blank" 
+  href="https://twitter.com/intent/tweet?text=${tweet}"
+  data-size="large">
+    <i class="fab fa-twitter"></i></a>
+  </a>
+  <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://vanhack.com/${linkedin}" target="_blank" title="Share on LinkedIn">
+    <i class="fab fa-linkedin"></i>
+  </a>`;
+};
+
 const eventComponent = (event, past = false, attending = false, thumbnail = false) => {
   const {
     type, premium, id, title, date, location, deadLine, country,
   } = event;
 
   const onClick = thumbnail ? `featureEvent(${id})` : `attendingDetails(${id})`;
-  const tweet = `I'm going to Vanhack ${title} ${type}. Come with me, check it out at https://vanhack.com/platform/#/events`
-  const linkedin = `${id}_${title}`;
 
-  const socialLinks = `<div class="tooltip tooltip-row">
-    <a class="twitter-share-button" target="_blank" 
-    href="https://twitter.com/intent/tweet?text=${tweet}"
-    data-size="large">
-      <i class="fab fa-twitter"></i></a>
-    </a>
-    <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://vanhack.com/${linkedin}" target="_blank" title="Share on LinkedIn">
-      <i class="fab fa-linkedin"></i>
-    </a>
-    </div>`;
+  const smTooltip = `<div class="tooltip tooltip-row">
+    ${socialLinks(id, title, type)}
+  </div>`;
 
   return (
     `<article class='event ${past && !attending ? 'card-micro' : ''} ${attending ? 'card-macro' : ''} card ${type}-event ${premium ? 'premium-event' : ''}' onclick=${onClick} data-event='${id}' id='${id}'>
@@ -212,7 +231,7 @@ const eventComponent = (event, past = false, attending = false, thumbnail = fals
       : `<button class='apply-btn button-default' data-event='${id}' type='button'>APPLY</button>` }
         <div class="tooltip-owner tooltip-media">
           <i class="fas fa-share-alt"></i>
-          ${socialLinks}
+          ${smTooltip}
         </div>
       </div>
     </div>`
@@ -226,9 +245,6 @@ const attendingDetails = (key) => {
     id, country, type, title, premium, date, location, description, container, deadLine,
   } = Db.events[key];
   const modal = document.getElementById('event-modal');
-
-  const tweet = `I'm going to Vanhack ${title} ${type}. Come with me, check it out at https://vanhack.com/platform/#/events`
-  const linkedin = `${id}_${title}`;
 
   modal.querySelector('.modal-content').innerHTML = `
   <h2>${title}</h2>
@@ -246,13 +262,7 @@ const attendingDetails = (key) => {
     ` : ''}
   </div>
   <div class='social-media'>
-    <a class="twitter-share-button" target="_blank" 
-    href="https://twitter.com/intent/tweet?text=${tweet}"
-    data-size="large">
-    <i class="fab fa-twitter"></i></a>
-    <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://vanhack.com/${linkedin}" target="_blank" title="Share on LinkedIn">
-      <i class="fab fa-linkedin"></i>
-    </a>
+    ${socialLinks(id, title, type)}
   </div>
   `;
 
