@@ -133,16 +133,21 @@ Event({
 });
 
 Event({
-  type: 'Webnar', premium: false, title: 'Leap into', description, country: 'CA', location: 'Sao Paulo', date: new Date(Date.UTC(2020, 8, 10, 15, 0, 0, 0)), deadLine: 'Mon 1 2020',
+  type: 'Webinar', premium: false, title: 'Leap into', description, country: 'CA', location: 'Sao Paulo', date: new Date(Date.UTC(2020, 8, 10, 15, 0, 0, 0)), deadLine: 'Mon 1 2020',
 });
 
 
 const mission = Event({
-  type: 'Webnar', premium: true, title: 'Latin America', description, country: 'US', location: 'Sao Paulo', date: new Date(Date.UTC(2020, 3, 21, 11, 0, 0, 0)), deadLine: 'Mon 1 2020',
+  type: 'Webinar', premium: true, title: 'Latin America', description, country: 'US', location: 'Sao Paulo', date: new Date(Date.UTC(2020, 3, 21, 11, 0, 0, 0)), deadLine: 'Mon 1 2020',
 });
 const recruitment2 = Event({
   type: 'Vanhackathon', premium: false, title: 'Leap into Canada', description, country: 'CA', location: 'Sao Paulo', date: new Date(Date.UTC(2020, 5, 10, 15, 0, 0, 0)), deadLine: 'Mon 1 2020',
 });
+
+const tweetEvent = (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+};
 
 const closeModal = (cover, modal) => {
   const modal2Close = document.getElementById(modal);
@@ -158,14 +163,16 @@ const eventComponent = (event, past = false, attending = false, thumbnail = fals
   } = event;
 
   const onClick = thumbnail ? `featureEvent(${id})` : `attendingDetails(${id})`;
+  const tweet = `I'm going to Vanhack ${title} ${type}. Come with me, check it out at https://vanhack.com/platform/#/events`
+  const linkedin = `${id}_${title}`;
 
   const socialLinks = `<div class="tooltip tooltip-row">
-    <a class="twitter-share-button"
-    href="https://twitter.com/intent/tweet?text=Check%20out%20this%20VanHack%20event%20at%20link"
+    <a class="twitter-share-button" target="_blank" 
+    href="https://twitter.com/intent/tweet?text=${tweet}"
     data-size="large">
       <i class="fab fa-twitter"></i></a>
     </a>
-    <a href="#">
+    <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://vanhack.com/${linkedin}" target="_blank" title="Share on LinkedIn">
       <i class="fab fa-linkedin"></i>
     </a>
     </div>`;
@@ -203,7 +210,7 @@ const eventComponent = (event, past = false, attending = false, thumbnail = fals
       <div class='button-row'>
         ${attending ? `<button class='aplication-btn button-default' data-event='${id}' type='button'>See Application</button>`
       : `<button class='apply-btn button-default' data-event='${id}' type='button'>APPLY</button>` }
-        <div class="tooltip-owner">
+        <div class="tooltip-owner tooltip-media">
           <i class="fas fa-share-alt"></i>
           ${socialLinks}
         </div>
@@ -216,9 +223,13 @@ const eventComponent = (event, past = false, attending = false, thumbnail = fals
 
 const attendingDetails = (key) => {
   const {
-    country, type, title, premium, date, location, description, container, deadLine,
+    id, country, type, title, premium, date, location, description, container, deadLine,
   } = Db.events[key];
   const modal = document.getElementById('event-modal');
+
+  const tweet = `I'm going to Vanhack ${title} ${type}. Come with me, check it out at https://vanhack.com/platform/#/events`
+  const linkedin = `${id}_${title}`;
+
   modal.querySelector('.modal-content').innerHTML = `
   <h2>${title}</h2>
   <div class='event-detail'>
@@ -235,11 +246,13 @@ const attendingDetails = (key) => {
     ` : ''}
   </div>
   <div class='social-media'>
-    <a class="twitter-share-button"
-    href="https://twitter.com/intent/tweet?text=Im%20going%20to%20the%20VanHack%20event%20at%20link"
+    <a class="twitter-share-button" target="_blank" 
+    href="https://twitter.com/intent/tweet?text=${tweet}"
     data-size="large">
     <i class="fab fa-twitter"></i></a>
-    <a href="#"><i class="fab fa-linkedin"></i></a>
+    <a href="https://www.linkedin.com/sharing/share-offsite/?url=https://vanhack.com/${linkedin}" target="_blank" title="Share on LinkedIn">
+      <i class="fab fa-linkedin"></i>
+    </a>
   </div>
   `;
 
@@ -266,7 +279,7 @@ const openPremiumModal = () => {
     <div class='premium-description'>
       <h3>Vanhack premium acount</h3>
       <p>
-        One of many perks of having being a premium Vanhack user is the access to premium webnars that give you insider access to the best international companies recruiting proccesses.
+        One of many perks of having being a premium Vanhack user is the access to premium webinars that give you insider access to the best international companies recruiting proccesses.
       </p>
       <p><a href='#'>Find out more.</a></p>
     </div>
@@ -330,7 +343,7 @@ const selectComponent = () => {
 const welcomeComponent = () => {
   return `<article class='visitor-welcome'>
   <h1>Welcome to the events app!</h1>
-  <p>Please, select one of the users below to login.</p>
+  <p>Please, select one of the available users below to login.</p>
   ${selectComponent()}
 </article>`;
 };
@@ -339,11 +352,14 @@ const emptyEvents = () => {
   return '<p>There are no remaining events to apply</p><p>check again later... <i class="fas fa-frog"></i></p>';
 };
 
+const showUsers = () => {
+  document.getElementById('change-user').classList.toggle('user-selector-open');
+};
+
 window.onload = () => {
   const userGreet = document.getElementById('current-user-greet');
   const userPic = document.getElementById('current-user-pic');
   const changeUser = document.getElementById('change-user');
-  const hiddenSelect = document.getElementById('hidden-select');
   const eventContainer = document.getElementById('events');
   const applyedEvents = document.getElementById('my-events');
   const alertContainer = document.getElementById('alert');
@@ -504,27 +520,27 @@ window.onload = () => {
 
   addEvent2Btns();
 
-  const populateUsers = () => {
+  const populateUsers = (id) => {
+    const selector = document.getElementById(id);
+    const tooltip = selector.querySelector('.tooltip');
+
     for (const key in Db.users) {
       const { id, firstName, premium } = Db.users[key];
       if (key !== 'nextId') {
-        document.getElementById('user-select').querySelector('.tooltip').innerHTML += `<a class='user' data-user=${id}>${firstName} (${premium ? 'premium' : 'regular'})</a>`;
+        selector.querySelector('.tooltip').innerHTML += `<a class='user' data-user=${id}>${firstName} (${premium ? 'premium' : 'regular'})</a>`;
       }
     }
 
-    if (document.getElementById('change-user').childElementCount > 0) {
-      document.getElementById('change-user').addEventListener('click', e => {
-        document.getElementById('user-select').toggle('user-selector-open');
-      });
-    } else {
-      document.getElementById('user-select').addEventListener('click', e => {
-        e.target.classList.toggle('user-selector-open');
-      });
-    }
+    selector.addEventListener('click', (e) => {
+      if (selector.id !== 'change-user') {
+        selector.classList.toggle('user-selector-open');        
+      }
+      e.stopPropagation();
+    });
   };
 
   const addEventToUserSelect = () => {
-    Array.from(document.getElementById('user-select').querySelectorAll('.user')).forEach((user) => {
+    Array.from(document.querySelectorAll('.user')).forEach((user) => {
       user.addEventListener('click', () => {
         loaderOn();
         loaderOver(2000);
@@ -538,10 +554,13 @@ window.onload = () => {
   const checkLoggedUser = () => {
     const user = loggedUser.logged();
     if (user) {
+      document.getElementById('change-user').classList.remove('hidden');
       userGreet.innerHTML = `Welcome, ${user.firstName}`;
       userPic.innerHTML = `${user.premium ? '<i class="fa fa-star premium-pic-star"></i><div class="premium-user ' : '<div class="'}current-user-pic"><img class='profile-pic' src='${user.picture}' alt='profile-image'/></div>`;
-      hiddenSelect.innerHTML = selectComponent();
-      changeUser.innerHTML = `<i class="fas fa-caret-down"></i>`;
+      changeUser.classList.add('tooltip-owner');
+      changeUser.setAttribute('onclick', 'showUsers()');
+      changeUser.innerHTML = '<i class="fas fa-caret-down"></i><div class="tooltip tooltip-column"><a href="#" class="user" data-user="-1" default="">Visitor</a></div>';
+      populateUsers('change-user');
       const currentEvents = populateEvents(user);
       const sorEvents = {
         attending: sortEvents(currentEvents.attending, 1),
@@ -551,17 +570,17 @@ window.onload = () => {
 
       addEvents2Dom(sorEvents);
       addEvent2Btns();
-      populateUsers();
       addEventToUserSelect();
     } else {
-      hiddenSelect.innerHTML = '';
       applyedEvents.classList.add('events-empty');
       userGreet.innerHTML = 'Hi, Visitor';
       userPic.innerHTML = '';
       changeUser.innerHTML = '';
       applyedEvents.innerHTML = welcomeComponent();
-      populateUsers();
+      populateUsers('user-select');
       addEventToUserSelect();
+      document.getElementById('attending-next').classList.add('hidden');
+      document.getElementById('change-user').classList.add('hidden');
     }
   };
 

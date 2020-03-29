@@ -108,6 +108,10 @@ a:active {
   border-radius: 4px;
 }
 
+.fa-caret-down {
+  pointer-events: none;
+}
+
 [class|=alert] {
   box-sizing: border-box;
   color: var(--black-95);
@@ -202,10 +206,6 @@ a:active {
   z-index: 100;
 }
 
-.drop-down {
-  pointer-events: none;
-}
-
 .top-nav li {
   list-style: none;
   margin: 0 10px;
@@ -266,28 +266,6 @@ a:active {
 .greet {
   justify-self: flex-end;
   z-index: 2;
-}
-
-#hidden-select {
-  opacity: 0;
-  position: absolute;
-  right: 0;
-  top: 15px;
-  z-index: 0;
-}
-
-#hidden-select:after {
-  content: '';
-  display: inline-block;
-  height: 30px;
-  left: 50px;
-  position: absolute;
-  top: 0;
-  width: 72px;
-}
-
-#hidden-select select {
-  cursor: pointer;
 }
 
 .visitor-welcome {
@@ -502,7 +480,7 @@ a:active {
   opacity: 0;
 }
 
-/* MeetUp, Leap, Recruiting, Mission, VanHackathon, Premium-only Webnar, Open Webnar */
+/* MeetUp, Leap, Recruiting, Mission, VanHackathon, Premium-only Webinar, Open Webinar */
 .meetup-cover {
   background-image: url('https://images.pexels.com/photos/1015568/pexels-photo-1015568.jpeg?auto=compress&cs=tinysrgb&h=650&w=940');
 }
@@ -523,7 +501,7 @@ a:active {
   background-image: url('https://images.pexels.com/photos/1181472/pexels-photo-1181472.jpeg?auto=compress&cs=tinysrgb&dpr=2&w=500');
 }
 
-.webnar-cover {
+.webinar-cover {
   background-image: url('https://blog.zoom.us/wordpress/wp-content/uploads/2019/08/zoom-video-webinar-apps.jpg');
 }
 
@@ -1000,6 +978,11 @@ a:active {
   position: relative;
 }
 
+.tooltip-media {
+  padding-top: 20px;
+  margin-bottom: 20px;
+}
+
 .tooltip {
   align-items: center;
   background-color: #fff;
@@ -1009,7 +992,7 @@ a:active {
   display: none;
   position: absolute;
   right: -1rem;
-  top: 1.5rem;
+  top: -1.5rem;
 }
 
 .tooltip-row {
@@ -1035,7 +1018,7 @@ a:active {
   border-top: 1px solid var(--black-10);
 }
 
-.tooltip-owner:hover .tooltip {
+.tooltip-owner:hover .tooltip, .tooltip:hover {
   display: flex;
 }
 
@@ -1054,6 +1037,17 @@ a:active {
   width: 200px;
 }
 
+.drop-down {
+  cursor: pointer;
+  padding-top: 0;
+  pointer-events: all;
+  width: 20px;
+}
+
+.drop-down .tooltip {
+  top: 2.3rem;
+}
+
 .user-selector::before {
   color: var(--black-10);
   content: 'Visitor';
@@ -1063,15 +1057,15 @@ a:active {
   content: '';
 }
 
-.user-selector-open {
+.user-selector-open.user-selector {
   box-shadow: inset 2px 2px 1px 0 #fff, inset -2px -3px 0 0 var(--black-10);
 }
 
-.user-selector-open .tooltip {
+.user-selector-open .tooltip, .tooltip-open {
   display: flex;
 }
 
-.user-selector:hover .tooltip {
+.user-selector:hover .tooltip, .drop-down:hover .tooltip {
   display: none;
 }
 
